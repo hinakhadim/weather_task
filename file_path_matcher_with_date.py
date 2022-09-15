@@ -4,11 +4,11 @@ import re
 from collections import namedtuple
 
 
-months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+Months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 
-class FilePathMatcherWithDate:
+class FilePathsProviderMatchedWithDate:
 
     def __init__(self, data_folder_path) -> None:
         self.month = None
@@ -22,7 +22,7 @@ class FilePathMatcherWithDate:
             self.month = splitted_date[1]
         self.year = splitted_date[0]
 
-    def get_files_path(self):
+    def get_matched_files_path(self):
 
         if self.month and self.year:
             return ""
@@ -35,7 +35,7 @@ class FilePathMatcherWithDate:
         file_paths_of_a_year = []
 
         for file_name in os.listdir(self.data_folder_path):
-            file_year = self.get_file_month_year(file_name).year
+            file_year = self.get_file_month_year_from(file_name).year
 
             if self.year == file_year:
                 file_paths_of_a_year.append(
@@ -43,7 +43,7 @@ class FilePathMatcherWithDate:
 
         return file_paths_of_a_year
 
-    def get_file_month_year(self, filename):
+    def get_file_month_year_from(self, filename):
         matched_result = list(re.finditer(
             r'(?P<year>\d+)_(?P<month>\w+)', filename))
 
