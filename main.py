@@ -26,7 +26,7 @@ def generate_report(flag, value, data_folder):
         case '-e':
             generateReportHighLowTempHumidity(value, data_folder)
         case '-a':
-            pass
+            generateReportAverageTempHumidity(value, data_folder)
         case '-c':
             pass
         case _:
@@ -45,6 +45,19 @@ def generateReportHighLowTempHumidity(year, data_folder):
 
     generate_report = ReportGenerator()
     generate_report.highest_lowest_temp_and_humidity(report_data)
+
+
+def generateReportAverageTempHumidity(date, data_folder):   # date = year/month
+    file_paths_provider = FilePathsProviderMatchedWithDate(data_folder)
+    file_paths_provider.setDate(date)
+    matched_file_paths_with_date = file_paths_provider.get_matched_files_path()
+
+    statistics_calculator = WeatherStatisticsCalculator(
+        matched_file_paths_with_date)
+    report_data = statistics_calculator.calc_average_temp_and_humidity()
+
+    generate_report = ReportGenerator()
+    generate_report.average_max_min_temp_and_mean_humidity(report_data)
 
 
 if __name__ == "__main__":
