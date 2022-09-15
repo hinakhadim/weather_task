@@ -33,14 +33,20 @@ def generate_report(flag, value, data_folder):
             print("No flag sent")
 
 
-def generateReportHighLowTempHumidity(year, data_folder):
+def get_statistics_calculator_instance(date, data_folder):
 
     file_paths_provider = FilePathsProviderMatchedWithDate(data_folder)
-    file_paths_provider.setDate(year)
+    file_paths_provider.setDate(date)
     matched_file_paths_with_year = file_paths_provider.get_matched_files_path()
 
     statistics_calculator = WeatherStatisticsCalculator(
         matched_file_paths_with_year)
+    return statistics_calculator
+
+
+def generateReportHighLowTempHumidity(year, data_folder):
+
+    statistics_calculator = get_statistics_calculator_instance()
     report_data = statistics_calculator.calc_low_and_high_temp_and_humidity()
 
     generate_report = ReportGenerator()
@@ -52,8 +58,7 @@ def generateReportAverageTempHumidity(date, data_folder):   # date = year/month
     file_paths_provider.setDate(date)
     matched_file_paths_with_date = file_paths_provider.get_matched_files_path()
 
-    statistics_calculator = WeatherStatisticsCalculator(
-        matched_file_paths_with_date)
+    statistics_calculator = get_statistics_calculator_instance
     report_data = statistics_calculator.calc_average_temp_and_humidity()
 
     generate_report = ReportGenerator()
