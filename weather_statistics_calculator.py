@@ -5,6 +5,17 @@ from report_types import AverageTempHumidReportType
 from report_types import HighLowTempHumidityReportType
 
 
+dummy_record_for_comparison = {
+    'PKT': "2022-08-16",
+    'Mean TemperatureC': None,
+    'Max TemperatureC': -sys.maxsize,
+    'Min TemperatureC': sys.maxsize,
+    ' Min Humidity': sys.maxsize,
+    'Max Humidity': -sys.maxsize,
+    ' Mean Humidity': None
+}
+
+
 class WeatherStatisticsCalculator:
 
     def __init__(self, filepaths) -> None:
@@ -28,39 +39,48 @@ class WeatherStatisticsCalculator:
         if len(self.file_records) == 0:
             return None
 
-        report = HighLowTempHumidityReportType(
-            highest_temperature=self.get_highest_max_temperature(),
-            lowest_temperature=self.get_lowest_min_temperature(),
-            high_humidity=self.get_highest_max_humidity()
+        return self.get_low_high_temp_and_max_humidity()
+
+    def get_low_high_temp_and_max_humidity(self):
+
+        max_high_temp = WeatherRecord(dummy_record_for_comparison)
+        min_low_temp = WeatherRecord(dummy_record_for_comparison)
+        max_high_humidity = WeatherRecord(dummy_record_for_comparison)
+
+        for record in self.file_records:
+
+            if self.high_temp_less_than_record(max_high_temp, record):
+                max_high_temp = record
+
+            if self.low_temp_greater_than_record(min_low_temp, record):
+                min_low_temp = record
+
+            if self.high_humid_less_than_record(max_high_humidity, record):
+                max_high_humidity = record
+
+        return HighLowTempHumidityReportType(
+            highest_temperature=max_high_temp,
+            lowest_temperature=min_low_temp,
+            high_humidity=max_high_humidity
         )
 
-        return report
-
-    def get_highest_max_temperature(self):
-        return sorted(self.file_records,
-                      key=self.max_temperature_sorter, reverse=True)[0]
-
-    def max_temperature_sorter(self, record):
+    def high_temp_less_than_record(self, max_high_temp, record):
         if record.max_temp:
-            return int(record.max_temp)
-        return -sys.maxsize
+            if int(max_high_temp.max_temp) < int(record.max_temp):
+                return True
+        return False
 
-    def get_lowest_min_temperature(self):
-        return sorted(self.file_records, key=self.min_temperature_sorter)[0]
-
-    def min_temperature_sorter(self, record):
+    def low_temp_greater_than_record(self, min_low_temp, record):
         if record.min_temp:
-            return int(record.min_temp)
-        return sys.maxsize
+            if int(min_low_temp.min_temp) > int(record.min_temp):
+                return True
+        return False
 
-    def get_highest_max_humidity(self):
-        return sorted(self.file_records,
-                      key=self.max_humidity_sorter, reverse=True)[0]
-
-    def max_humidity_sorter(self, record):
+    def high_humid_less_than_record(self, max_high_humid, record):
         if record.max_humidity:
-            return int(record.max_humidity)
-        return -sys.maxsize
+            if int(max_high_humid.max_humidity) < int(record.max_humidity):
+                return True
+        return False
 
     def calc_average_temp_and_humidity(self):
         if len(self.file_records) == 0:
