@@ -1,29 +1,87 @@
 import sys
 import os
-from file_path_matcher_with_date import FilePathMatcherWithDate
+from report_generator import ReportGenerator
+from file_path_matcher_with_date import FilePathsProviderMatchedWithDate
+from weather_statistics_calculator import WeatherStatisticsCalculator
 
 CURRENT_DIRECTORY = os.getcwd()
+MIN_REQUIRED_ARGS = 4
+
+
+def isNotValidLengthOfARGS(arguments):
+    return len(arguments) < MIN_REQUIRED_ARGS
+
+
+def isNotValidDirectoryPath(folder_path):
+    print(folder_path)
+    return not os.path.isdir(folder_path)
+
+
+def isOdd(args):
+    return len(args) % 2 != 0
+
+
+def generate_report(flag, value, data_folder):
+    match flag:
+        case '-e':
+            generateReportHighLowTempHumidity(value, data_folder)
+        case '-a':
+            generateReportAverageTempHumidity(value, data_folder)
+        case '-c':
+            pass
+        case _:
+            print("No flag sent")
+
+
+def get_statistics_calculator_instance(date, data_folder):
+
+    file_paths_provider = FilePathsProviderMatchedWithDate(data_folder)
+    file_paths_provider.setDate(date)
+    matched_file_paths_with_year = file_paths_provider.get_matched_files_path()
+
+    statistics_calculator = WeatherStatisticsCalculator(
+        matched_file_paths_with_year)
+    return statistics_calculator
+
+
+def generateReportHighLowTempHumidity(year, data_folder):
+
+    statistics_calculator = get_statistics_calculator_instance()
+    report_data = statistics_calculator.calc_low_and_high_temp_and_humidity()
+
+    generate_report = ReportGenerator()
+    generate_report.highest_lowest_temp_and_humidity(report_data)
+
+
+def generateReportAverageTempHumidity(date, data_folder):   # date = year/month
+    file_paths_provider = FilePathsProviderMatchedWithDate(data_folder)
+    file_paths_provider.setDate(date)
+    matched_file_paths_with_date = file_paths_provider.get_matched_files_path()
+
+    statistics_calculator = get_statistics_calculator_instance
+    report_data = statistics_calculator.calc_average_temp_and_humidity()
+
+    generate_report = ReportGenerator()
+    generate_report.average_max_min_temp_and_mean_humidity(report_data)
+
 
 if __name__ == "__main__":
 
-    if len(sys.argv) < 4:
+    if isNotValidLengthOfARGS(sys.argv):
         print("You must specify files path and the command with proper flag")
         sys.exit(0)
 
-    weather_data_files_path = CURRENT_DIRECTORY + sys.argv[1]
-    if not os.path.isdir(weather_data_files_path):
-        print("Invalid path to directory : ", weather_data_files_path)
+    weather_data_folder_path = CURRENT_DIRECTORY + sys.argv[1]
+    if isNotValidDirectoryPath(weather_data_folder_path):
+        print("Invalid path to directory : ", weather_data_folder_path)
         sys.exit(0)
 
-    print(weather_data_files_path)
+    arg_flags_with_values = sys.argv[2:]
 
-    system_args = sys.argv[2:]
+    if isOdd(arg_flags_with_values):
+        print("All flags must have values")
+        sys.exit(0)
 
-    year = sys.argv[3]
-
-    file_path_matcher = FilePathMatcherWithDate(weather_data_files_path)
-    file_path_matcher.setDate(year)
-    matched_file_paths_with_year = file_path_matcher.get_files_path()
-
-    # for index, argument in enumerate(system_args):
-    #     pass
+    for i in range(0, len(arg_flags_with_values) // 2, 2):
+        flag, value = arg_flags_with_values[i], arg_flags_with_values[i + 1]
+        generate_report(flag, value, weather_data_folder_path)
