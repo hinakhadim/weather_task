@@ -18,7 +18,7 @@ class ReportGenerator:
 
         print("\n================== Report =================")
         print("================== Highest and Lowest Temperature and Maximum"
-              "Humidity =================")
+              " Humidity =================")
 
         if not report_data:
             print("\nThere is no data for generating a report\n")
@@ -32,7 +32,7 @@ class ReportGenerator:
             f"Highest Temperature: {highest_temp.max_temp}°C on "
             f"{self.format_date_from(highest_temp.date)}")
         print(
-            f"Lowest Temperature: {lowest_temp.max_temp}°C on "
+            f"Lowest Temperature: {lowest_temp.min_temp}°C on "
             f"{self.format_date_from(lowest_temp.date)}")
         print(
             f"Highest Humidity: {high_humid.max_humidity}% on "
@@ -48,7 +48,7 @@ class ReportGenerator:
                                                ]):
         print("\n================== Report =================")
         print("================== Average Highest and Lowest Temperature and"
-              "Mean Humidity =================")
+              " Mean Humidity =================")
 
         if not report_data:
             print("\nThere is no data for generating a report\n")

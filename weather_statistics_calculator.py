@@ -15,7 +15,7 @@ class WeatherStatisticsCalculator:
             self.file_data_reader_and_add_to_file_records(filepath)
 
     def file_data_reader_and_add_to_file_records(self, filepath):
-        print(filepath)
+
         with open(filepath, 'r') as file:
             records_list = csv.DictReader(file)
 
@@ -30,7 +30,7 @@ class WeatherStatisticsCalculator:
 
         report = HighLowTempHumidityReportType(
             highest_temperature=self.get_highest_max_temperature(),
-            lowest_temperature=self.get_lowest_min_temperature,
+            lowest_temperature=self.get_lowest_min_temperature(),
             high_humidity=self.get_highest_max_humidity()
         )
 

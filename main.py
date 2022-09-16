@@ -46,7 +46,8 @@ def get_statistics_calculator_instance(date, data_folder):
 
 def generateReportHighLowTempHumidity(year, data_folder):
 
-    statistics_calculator = get_statistics_calculator_instance()
+    statistics_calculator = get_statistics_calculator_instance(
+        year, data_folder)
     report_data = statistics_calculator.calc_low_and_high_temp_and_humidity()
 
     generate_report = ReportGenerator()
@@ -54,11 +55,9 @@ def generateReportHighLowTempHumidity(year, data_folder):
 
 
 def generateReportAverageTempHumidity(date, data_folder):   # date = year/month
-    file_paths_provider = FilePathsProviderMatchedWithDate(data_folder)
-    file_paths_provider.setDate(date)
-    matched_file_paths_with_date = file_paths_provider.get_matched_files_path()
 
-    statistics_calculator = get_statistics_calculator_instance
+    statistics_calculator = get_statistics_calculator_instance(
+        date, data_folder)
     report_data = statistics_calculator.calc_average_temp_and_humidity()
 
     generate_report = ReportGenerator()
@@ -82,6 +81,7 @@ if __name__ == "__main__":
         print("All flags must have values")
         sys.exit(0)
 
-    for i in range(0, len(arg_flags_with_values) // 2, 2):
+    for i in range(0, (len(arg_flags_with_values) // 2) + 1, 2):
+        print(arg_flags_with_values[i], i)
         flag, value = arg_flags_with_values[i], arg_flags_with_values[i + 1]
         generate_report(flag, value, weather_data_folder_path)
