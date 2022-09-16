@@ -28,7 +28,10 @@ def generate_report(flag, value, data_folder):
         case '-a':
             generateReportAverageTempHumidity(value, data_folder)
         case '-c':
-            pass
+            generateTemperatureChartReport(value, data_folder)
+        case '-cs':
+            generateTemperatureChartReport(
+                value, data_folder, single_chart=True)
         case _:
             print("No flag sent")
 
@@ -64,6 +67,20 @@ def generateReportAverageTempHumidity(date, data_folder):   # date = year/month
     generate_report.average_max_min_temp_and_mean_humidity(report_data)
 
 
+# date = year/month
+def generateTemperatureChartReport(date, data_folder, single_chart=False):
+
+    statistics_calculator = get_statistics_calculator_instance(
+        date, data_folder)
+    report_data = statistics_calculator.get_charts_data()
+
+    generate_report = ReportGenerator()
+    if single_chart:
+        generate_report.high_low_temperature_single_chart(report_data)
+    else:
+        generate_report.high_low_temperature_charts(report_data)
+
+
 if __name__ == "__main__":
 
     if isNotValidLengthOfARGS(sys.argv):
@@ -82,6 +99,5 @@ if __name__ == "__main__":
         sys.exit(0)
 
     for i in range(0, (len(arg_flags_with_values) // 2) + 1, 2):
-        print(arg_flags_with_values[i], i)
         flag, value = arg_flags_with_values[i], arg_flags_with_values[i + 1]
         generate_report(flag, value, weather_data_folder_path)

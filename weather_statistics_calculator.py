@@ -104,3 +104,6 @@ class WeatherStatisticsCalculator:
             # else : assume max_temp to zero
 
         return total_sum_of_mean_humid / len(self.file_records)
+
+    def get_charts_data(self):
+        return self.file_records
