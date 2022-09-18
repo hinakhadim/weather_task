@@ -34,7 +34,7 @@ class WeatherStatisticsCalculator:
                 record = WeatherRecord(row)
                 self.file_records.append(record)
 
-    def calc_low_and_high_temp_and_humidity(self):
+    def calc_low_and_high_temp_and_humid(self):
 
         if len(self.file_records) == 0:
             return None

@@ -1,6 +1,7 @@
 
 import os
 import re
+import sys
 from collections import namedtuple
 
 
@@ -15,12 +16,26 @@ class FilePathsProviderMatchedWithDate:
         self.year = None
         self.data_folder_path = data_folder_path
 
-    def setDate(self, date):
+    def matchWith(self, date):
         splitted_date = date.split("/")         # date = yyyy/m
 
-        if len(splitted_date) > 1:
+        if len(splitted_date) > 1 and self.is_month_in_range(splitted_date[1]):
             self.month = Months[int(splitted_date[1]) - 1]
         self.year = splitted_date[0]
+
+    def is_month_in_range(self, monthString):
+        try:
+            month = int(monthString)
+
+            if month < 1 or month > 12:
+                raise Exception()
+
+        except Exception as e:
+            print("Month name should be valid number from 1 - 12 ")
+            print(e)
+            sys.exit(0)
+
+        return True
 
     def get_matched_files_path(self):
 
@@ -35,7 +50,7 @@ class FilePathsProviderMatchedWithDate:
         file_paths_of_a_year = []
 
         for file_name in os.listdir(self.data_folder_path):
-            file_year = self.get_file_month_year_from(file_name).year
+            file_year = self.get_month_year_from(file_name).year
 
             if self.year == file_year:
                 file_paths_of_a_year.append(
@@ -43,7 +58,22 @@ class FilePathsProviderMatchedWithDate:
 
         return file_paths_of_a_year
 
-    def get_file_month_year_from(self, filename):
+    def get_specific_month_year_file_paths(self):
+        file_paths_of_a_month_in_year = []
+
+        for file_name in os.listdir(self.data_folder_path):
+            file_date = self.get_month_year_from(file_name)
+            file_month, file_year = file_date.month, file_date.year
+
+            if self.month == file_month and self.year == file_year:
+                file_paths_of_a_month_in_year.append(
+                    os.path.join(self.data_folder_path, file_name))
+                break
+                # since the given month of the given year has only 1 file
+
+        return file_paths_of_a_month_in_year
+
+    def get_month_year_from(self, filename):
         matched_result = list(re.finditer(
             r'(?P<year>\d+)_(?P<month>\w+)', filename))
 
@@ -56,18 +86,3 @@ class FilePathsProviderMatchedWithDate:
             return date_object
 
         return DateObj()
-
-    def get_specific_month_year_file_paths(self):
-        file_paths_of_a_month_in_year = []
-
-        for file_name in os.listdir(self.data_folder_path):
-            file_date = self.get_file_month_year_from(file_name)
-            file_month, file_year = file_date.month, file_date.year
-
-            if self.month == file_month and self.year == file_year:
-                file_paths_of_a_month_in_year.append(
-                    os.path.join(self.data_folder_path, file_name))
-                break
-                # since the given month of the given year has only 1 file
-
-        return file_paths_of_a_month_in_year
