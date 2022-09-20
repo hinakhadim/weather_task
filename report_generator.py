@@ -27,13 +27,15 @@ class ReportGenerator:
         matched_file_paths_with_date = file_paths.get_matched_files_path()
 
         statistics_calculator = WeatherStatisticsCalculator(
-            matched_file_paths_with_date)
+            matched_file_paths_with_date
+        )
         return statistics_calculator
 
     def generateReportHighLowTempHumidity(self, year, data_folder):
 
         statistics_calculator = self.get_statistics_calculator_instance(
-            year, data_folder)
+            year, data_folder
+        )
         report_data = statistics_calculator.calc_low_and_high_temp_and_humid()
 
         report_template_of = ReportTemplate()
