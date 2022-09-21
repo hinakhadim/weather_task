@@ -1,79 +1,155 @@
+from typing import List, Optional
+from report_types import AverageTempHumidReportType
+from report_types import HighLowTempHumidityReportType
+from weather_record import WeatherRecord
+from constants import COLORS
 
-from file_path_matcher_with_date import FilePathsProviderMatchedWithDate
-from report_template import ReportTemplate
-from weather_statistics_calculator import WeatherStatisticsCalculator
+Months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 
 class ReportGenerator:
 
-    def generate_report_for(self, flag, value, data_folder):
-        match flag:
-            case '-e':
-                self.generateReportHighLowTempHumidity(value, data_folder)
-            case '-a':
-                self.generateReportAverageTempHumidity(value, data_folder)
-            case '-c':
-                self.generateTemperatureChartReport(value, data_folder)
-            case '-cs':
-                self.generateTemperatureChartReport(
-                    value, data_folder, single_chart=True)
-            case _:
-                print("No flag sent")
+    def gen_report_highest_lowest_temp_and_humidity(
+            self, report_data:
+            Optional[HighLowTempHumidityReportType]
+            ):
 
-    def get_statistics_calculator_instance(self, date, data_folder):
+        print("\n================== Report =================")
+        print(
+            "================== Highest and Lowest Temperature and Maximum"
+            " Humidity ================="
+            )
 
-        file_paths = FilePathsProviderMatchedWithDate(data_folder)
-        file_paths.matchWith(date)
-        matched_file_paths_with_date = file_paths.get_matched_files_path()
-
-        statistics_calculator = WeatherStatisticsCalculator(
-            matched_file_paths_with_date
-        )
-        return statistics_calculator
-
-    def generateReportHighLowTempHumidity(self, year, data_folder):
-
-        statistics_calculator = self.get_statistics_calculator_instance(
-            year, data_folder
-        )
-        report_data = statistics_calculator.calc_low_and_high_temp_and_humid()
-
-        report_template_of = ReportTemplate()
-        report_template_of.highest_lowest_temp_and_humidity(report_data)
-
-    # date = year/month
-    def generateReportAverageTempHumidity(self, date, data_folder):
-        # date = yyyy/m
-        if self.is_not_month_given(date):
-            print("Error: Month is required to perform calculations")
+        if not report_data:
+            print("\nThere is no data for generating a report\n")
             return
 
-        statistics_calculator = self.get_statistics_calculator_instance(
-            date, data_folder)
-        report_data = statistics_calculator.calc_average_temp_and_humidity()
+        highest_temp = report_data.highest_temperature
+        lowest_temp = report_data.lowest_temperature
+        high_humid = report_data.high_humidity
 
-        report_template_of = ReportTemplate()
-        report_template_of.average_max_min_temp_and_mean_humidity(report_data)
+        print(
+            f"Highest Temperature: {highest_temp.max_temp}°C on "
+            f"{self.format_date_from(highest_temp.date)}"
+        )
+        print(
+            f"Lowest Temperature: {lowest_temp.min_temp}°C on "
+            f"{self.format_date_from(lowest_temp.date)}"
+        )
+        print(
+            f"Highest Humidity: {high_humid.max_humidity}% on "
+            f"{self.format_date_from(high_humid.date)}\n"
+        )
 
-    # date = year/month
+    def format_date_from(self, date):
+        year, month, day = date.split("-")
+        return f"{Months[int(month) - 1]} {day}, {year}"
 
-    def generateTemperatureChartReport(self, date, data_folder,
-                                       single_chart=False):
+    def gen_report_average_max_min_temp_and_mean_humidity(
+            self, report_data:
+            Optional[
+                AverageTempHumidReportType
+            ]
+            ):
+        print("\n================== Report =================")
+        print(
+            "================== Average Highest and Lowest Temperature and"
+            " Mean Humidity ================="
+            )
 
-        if self.is_not_month_given(date):
-            print("Error: Month is required to perform calculations")
+        if not report_data:
+            print("\nThere is no data for generating a report\n")
             return
 
-        statistics_calculator = self.get_statistics_calculator_instance(
-            date, data_folder)
-        report_data = statistics_calculator.get_charts_data()
+        average_highest_temp = report_data.average_max_temperature
+        average_low_temp = report_data.average_min_temperature
+        average_humid = report_data.average_mean_humidity
 
-        report_template_of = ReportTemplate()
-        if single_chart:
-            report_template_of.high_low_temperature_single_chart(report_data)
-        else:
-            report_template_of.high_low_temperature_charts(report_data)
+        print(
+            f"Highest Average Temperature: {average_highest_temp}°C"
+        )
+        print(
+            f"Lowest Average Temperature: {average_low_temp}°C"
+        )
+        print(
+            f"Average Mean Humidity: {average_humid}%\n"
+        )
 
-    def is_not_month_given(self, date):
-        splitted_date = date.split("/")
-        return len(splitted_date) <= 1
+    def gen_report_high_low_temperature_charts(
+            self, report_data: List[WeatherRecord]
+            ):
+
+        print("\n================== Report =================")
+
+        if not report_data:
+            print("\nThere are no data to draw the charts\n")
+            return
+
+        date = self.get_date_from(report_data[0].date)
+        print(
+            "================= Temperature Charts"
+            f" {Months[int(date['month']) - 1]}, {date['year']} ==============="
+            )
+
+        for record in report_data:
+            self.draw_2_charts_of_high_low_temp_for_1_day(record)
+
+    def draw_2_charts_of_high_low_temp_for_1_day(self, record: WeatherRecord):
+        day = self.get_date_from(record.date)['day']
+        formatted_day = self.append_zero_to_start_in_day(day)
+
+        print(COLORS.RED + formatted_day, end=" ")
+        self.draw_temperature_chart(record.max_temp)
+        print(f" {record.max_temp}°C")
+
+        print(COLORS.BLUE + formatted_day, end=" ")
+        self.draw_temperature_chart(record.min_temp)
+        print(f" {record.min_temp}°C")
+
+    def gen_report_high_low_temperature_single_line_chart(
+            self, report_data:
+            List[WeatherRecord]
+            ):
+
+        print("\n================== Report =================")
+
+        if not report_data:
+            print("\nThere are no data to draw the charts\n")
+            return
+
+        date = self.get_date_from(report_data[0].date)
+        print(
+            "================== Temperature Charts"
+            f" {Months[int(date['month']) - 1]}, {date['year']} ================="
+            )
+
+        for record in report_data:
+            self.draw_1_chart_of_high_low_temp_for_1_day(record)
+
+    def draw_1_chart_of_high_low_temp_for_1_day(self, record: WeatherRecord):
+        day = self.get_date_from(record.date)['day']
+        formatted_day = self.append_zero_to_start_in_day(day)
+
+        print(formatted_day, end=" ")
+        print(COLORS.BLUE, end="")
+        self.draw_temperature_chart(record.min_temp)
+        print(COLORS.RED, end="")
+        self.draw_temperature_chart(record.max_temp)
+        print(COLORS.ENDC, end="")
+        print(f" {record.min_temp}°C - {record.max_temp}°C")
+
+    def draw_temperature_chart(self, temperature_string):
+        print("+" * self.get_integer_value_from(temperature_string), end="")
+
+    def append_zero_to_start_in_day(self, day):
+        return '0' + day if int(day) < 10 else day
+
+    def get_integer_value_from(self, string):
+        return int(string) if string else 0
+
+    def get_date_from(self, date_string):
+        year, month, day = date_string.split("-")
+        return {'day': day, 'month': month, 'year': year}
+
+

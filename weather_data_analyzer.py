@@ -1,9 +1,8 @@
 import csv
 import sys
 from weather_record import WeatherRecord
-from report_types import AverageTempHumidReportType
-from report_types import HighLowTempHumidityReportType
-
+from report_types \
+    import AverageTempHumidReportType, HighLowTempHumidityReportType
 
 dummy_record_for_comparison = {
     'PKT': "2022-08-16",
@@ -16,7 +15,7 @@ dummy_record_for_comparison = {
 }
 
 
-class WeatherStatisticsCalculator:
+class WeatherDataAnalyzer:
 
     def __init__(self, filepaths) -> None:
 
@@ -100,7 +99,6 @@ class WeatherStatisticsCalculator:
 
             if record.max_temp:
                 total_sum_of_max_temp += int(record.max_temp)
-            # else : assume max_temp to zero
 
         return total_sum_of_max_temp / len(self.file_records)
 
@@ -110,20 +108,18 @@ class WeatherStatisticsCalculator:
 
             if record.min_temp:
                 total_sum_of_min_temp += int(record.min_temp)
-            # else : assume max_temp to zero
 
         return total_sum_of_min_temp / len(self.file_records)
 
     def get_average_mean_humidity(self):
-        total_sum_of_mean_humid = 0
+        total_sum_of_mean_humidity = 0
 
         for record in self.file_records:
 
             if record.mean_humidity:
-                total_sum_of_mean_humid += int(record.mean_humidity)
-            # else : assume max_temp to zero
+                total_sum_of_mean_humidity += int(record.mean_humidity)
 
-        return total_sum_of_mean_humid / len(self.file_records)
+        return total_sum_of_mean_humidity / len(self.file_records)
 
     def get_charts_data(self):
         return self.file_records
