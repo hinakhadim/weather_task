@@ -5,6 +5,9 @@ from validations import is_month_not_given
 
 
 class ReportDataProvider:
+    """
+        Provide report data of different reports
+    """
 
     def __init__(self, year_month, data_folder):
         self.year_month = year_month
@@ -13,6 +16,13 @@ class ReportDataProvider:
         self.set_data_analyzer(year_month, data_folder)
 
     def set_data_analyzer(self, year_month, data_folder):
+        """
+        Get file paths matched with the given year_month and pass them into
+        weather analyzer
+
+        :param year_month:
+        :param data_folder:
+        """
 
         file_paths = YearMonthMatchedFilePathsProvider(year_month, data_folder)
         matched_file_paths_with_year_month = file_paths.get_matched_file_paths()
@@ -22,19 +32,36 @@ class ReportDataProvider:
         )
 
     def get_high_low_temp_high_humidity_data(self):
+        """
+        Returns the high temperature, low temperature and high humidity data
+        calculated from weatherAnalyzer
+
+        :return: HighLowTempHumidityReportType
+        """
 
         report_data = self.data_analyzer.calc_low_and_high_temp_and_humid()
         return report_data
 
     def get_average_temp_and_humidity(self):
+        """
+        Returns the average high temperature, average low temperature and
+        average high humidity data calculated from weatherAnalyzer
+
+        :return: AverageTempHumidReportType
+        """
+
         if is_month_not_given(self.year_month):
             raise Exception("Error: Month is required to perform calculations")
 
         report_data = self.data_analyzer.calc_average_temp_and_humidity()
         return report_data
 
-    def get_chart_data(self, single_line_chart=False):
+    def get_chart_data(self):
+        """
+        Returns chart data for a month calculated from weatherAnalyzer
 
+        :return: List[WeatherRecords]
+        """
         if is_month_not_given(self.year_month):
             raise Exception("Error: Month is required to perform calculations")
 

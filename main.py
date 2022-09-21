@@ -95,7 +95,7 @@ if __name__ == "__main__":
             data_provider = ReportDataProvider(
                 args.cs, weather_data_folder_path
             )
-            report_data = data_provider.get_chart_data(single_line_chart=True)
+            report_data = data_provider.get_chart_data()
 
             report_generator.gen_report_high_low_temperature_single_line_chart(
                 report_data

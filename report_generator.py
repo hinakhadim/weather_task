@@ -14,6 +14,8 @@ class ReportGenerator:
             self, report_data:
             Optional[HighLowTempHumidityReportType]
             ):
+        """ Generate Report of highest, lowest temperature and highest 
+        humidity from the given report_data"""
 
         print("\n================== Report =================")
         print(
@@ -48,10 +50,11 @@ class ReportGenerator:
 
     def gen_report_average_max_min_temp_and_mean_humidity(
             self, report_data:
-            Optional[
-                AverageTempHumidReportType
-            ]
+            Optional[AverageTempHumidReportType]
             ):
+        """ Generate Report of average highest, lowest temperature and mean 
+            humidity from the given report_data"""
+
         print("\n================== Report =================")
         print(
             "================== Average Highest and Lowest Temperature and"
@@ -79,6 +82,9 @@ class ReportGenerator:
     def gen_report_high_low_temperature_charts(
             self, report_data: List[WeatherRecord]
             ):
+        """ Generate Report of highest and lowest temperature charts-
+        It draws one chart for highest temperature and one for
+        lowest temperature for each day"""
 
         print("\n================== Report =================")
 
@@ -96,6 +102,13 @@ class ReportGenerator:
             self.draw_2_charts_of_high_low_temp_for_1_day(record)
 
     def draw_2_charts_of_high_low_temp_for_1_day(self, record: WeatherRecord):
+        """
+        Draws 2 charts - One in red color for high temperature and other in
+        Blue color for low temperature
+
+        :param record: WeatherRecord
+        """
+
         day = self.get_date_from(record.date)['day']
         formatted_day = self.append_zero_to_start_in_day(day)
 
@@ -111,6 +124,9 @@ class ReportGenerator:
             self, report_data:
             List[WeatherRecord]
             ):
+        """ Generate Report of highest and lowest temperature charts-
+            It draws one chart for highest temperature lowest temperature 
+            for each day"""
 
         print("\n================== Report =================")
 
@@ -128,6 +144,13 @@ class ReportGenerator:
             self.draw_1_chart_of_high_low_temp_for_1_day(record)
 
     def draw_1_chart_of_high_low_temp_for_1_day(self, record: WeatherRecord):
+        """
+        Draws 1 chart - Draw both high temperature and low temperature chart
+        in one single line containing Red and blue color respectively
+
+        :param record: WeatherRecord
+        """
+
         day = self.get_date_from(record.date)['day']
         formatted_day = self.append_zero_to_start_in_day(day)
 

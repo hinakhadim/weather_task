@@ -4,6 +4,12 @@ from collections import namedtuple
 
 
 def get_month_year_from(filename):
+    """
+    Extract month, year from given filename
+
+    :param filename:
+    :return: DateObj
+    """
     matched_result = list(
         re.finditer(
             r'(?P<year>\d+)_(?P<month>\w+)', filename
