@@ -76,7 +76,6 @@ class YearMonthMatchedFilePathsProvider:
                     os.path.join(self.data_folder_path, file_name)
                 )
                 break
-                # since the given month of the given year has only 1 file
 
     def get_matched_file_paths(self):
         """

@@ -1,8 +1,8 @@
 import csv
 import sys
 from weather_record import WeatherRecord
-from report_types \
-    import AverageTempHumidReportType, HighLowTempHumidityReportType
+from report_types import (AverageTempHumidReportType,
+                          HighLowTempHumidityReportType)
 
 dummy_record_for_comparison = {
     'PKT': "2022-08-16",
@@ -25,22 +25,22 @@ class WeatherDataAnalyzer:
 
         self.file_records = []
 
+        self.file_data_reader_and_add_to_file_records(filepaths)
+
+    def file_data_reader_and_add_to_file_records(self, filepaths):
+        """
+        Read the data of all files given in filepaths and append it to the list
+
+        :param filepaths:
+        """
+
         for filepath in filepaths:
-            self.file_data_reader_and_add_to_file_records(filepath)
+            with open(filepath, 'r') as file:
+                records_list = csv.DictReader(file)
 
-    def file_data_reader_and_add_to_file_records(self, filepath):
-        """
-        Read the data of given file and append it to the list
-
-        :param filepath:
-        """
-
-        with open(filepath, 'r') as file:
-            records_list = csv.DictReader(file)
-
-            for row in records_list:
-                record = WeatherRecord(row)
-                self.file_records.append(record)
+                for row in records_list:
+                    record = WeatherRecord(row)
+                    self.file_records.append(record)
 
     def calc_low_and_high_temp_and_humid(self):
 
