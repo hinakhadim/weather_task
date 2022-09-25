@@ -1,18 +1,10 @@
 import csv
 import sys
+from typing import List
+
 from weather_record import WeatherRecord
 from custom_types import (AverageTempHumidReportType,
                           HighLowTempHumidityReportType)
-
-dummy_record_for_comparison = {
-    'PKT': "2022-08-16",
-    'Mean TemperatureC': None,
-    'Max TemperatureC': -sys.maxsize,
-    'Min TemperatureC': sys.maxsize,
-    ' Min Humidity': sys.maxsize,
-    'Max Humidity': -sys.maxsize,
-    ' Mean Humidity': None
-}
 
 
 class WeatherDataAnalyzer:
@@ -23,7 +15,7 @@ class WeatherDataAnalyzer:
 
     def __init__(self, filepaths) -> None:
 
-        self.file_records = []
+        self.file_records: List[WeatherRecord] = []
 
         self.file_data_reader_and_add_to_file_records(filepaths)
 
@@ -57,20 +49,19 @@ class WeatherDataAnalyzer:
         :return: HighLowTempHumidityReportType
         """
 
-        max_high_temp = WeatherRecord(dummy_record_for_comparison)
-        min_low_temp = WeatherRecord(dummy_record_for_comparison)
-        max_high_humidity = WeatherRecord(dummy_record_for_comparison)
+        valid_high_temp_records = self.remove_none_values_of_max_temp()
+        valid_low_temp_records = self.remove_none_values_of_min_temp()
+        valid_high_humidity_records = self.remove_none_values_of_max_humidity()
 
-        for record in self.file_records:
-
-            if self.high_temp_less_than_record(max_high_temp, record):
-                max_high_temp = record
-
-            if self.low_temp_greater_than_record(min_low_temp, record):
-                min_low_temp = record
-
-            if self.high_humid_less_than_record(max_high_humidity, record):
-                max_high_humidity = record
+        max_high_temp = max(
+            valid_high_temp_records, key=lambda x: int(x.max_temp)
+        )
+        min_low_temp = min(
+            valid_low_temp_records, key=lambda x: int(x.min_temp)
+        )
+        max_high_humidity = max(
+            valid_high_humidity_records, key=lambda x: int(x.max_humidity)
+        )
 
         return HighLowTempHumidityReportType(
             highest_temperature=max_high_temp,
@@ -78,50 +69,53 @@ class WeatherDataAnalyzer:
             high_humidity=max_high_humidity
         )
 
-    def high_temp_less_than_record(self, max_high_temp, record):
+    def remove_none_values_of_max_temp(self):
         """
-        Returns true if given record has max_temp greater than the
-        max_temp of max_high_temp
+        Removes the records from file_records whose max_temperature value is None
 
-        :param max_high_temp:
-        :param record:
-        :return: bool
+        :return: List[WeatherRecords]
         """
 
-        if record.max_temp:
-            if int(max_high_temp.max_temp) < int(record.max_temp):
-                return True
-        return False
+        valid_max_temps = [
+            rec for rec in self.file_records if rec.max_temp
+        ]
+        return valid_max_temps
 
-    def low_temp_greater_than_record(self, min_low_temp, record):
+    def remove_none_values_of_min_temp(self):
         """
-        Returns true if the given record has min_temp minimum than the already
-        min_temp of min_low_temp
+        Removes the records from file_records whose min_temperature value is None
 
-        :param min_low_temp:
-        :param record:
-        :return: bool
+        :return: List[WeatherRecords]
         """
 
-        if record.min_temp:
-            if int(min_low_temp.min_temp) > int(record.min_temp):
-                return True
-        return False
+        valid_min_temps = [
+            rec for rec in self.file_records if rec.min_temp
+        ]
+        return valid_min_temps
 
-    def high_humid_less_than_record(self, max_high_humid, record):
+    def remove_none_values_of_max_humidity(self):
         """
-        Returns true if the given record has max_humidity greater than the
-        already max_humidity of max_high_humid
+        Removes the records from file_records whose max_humidity value is None
 
-        :param max_high_humid:
-        :param record:
-        :return: bool
+        :return: List[WeatherRecords]
         """
 
-        if record.max_humidity:
-            if int(max_high_humid.max_humidity) < int(record.max_humidity):
-                return True
-        return False
+        valid_max_humidity = [
+            rec for rec in self.file_records if rec.max_humidity
+        ]
+        return valid_max_humidity
+
+    def remove_none_values_of_mean_humidity(self):
+        """
+        Removes the records from file_records whose mean_humidity value is None
+
+        :return: List[WeatherRecords]
+        """
+
+        valid_mean_humidity = [
+            rec for rec in self.file_records if rec.mean_humidity
+        ]
+        return valid_mean_humidity
 
     def calc_average_temp_and_humidity(self):
         """
@@ -149,10 +143,8 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        valid_max_temps = [
-            int(rec.max_temp) for rec in self.file_records if rec.max_temp
-        ]
-        total = sum(valid_max_temps)
+        valid_max_temps = self.remove_none_values_of_max_temp()
+        total = sum([int(rec.max_temp) for rec in valid_max_temps])
         return total / len(self.file_records)
 
     def get_average_min_temperature(self):
@@ -162,10 +154,8 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        valid_min_temps = [
-            int(rec.min_temp) for rec in self.file_records if rec.min_temp
-        ]
-        total = sum(valid_min_temps)
+        valid_min_temps = self.remove_none_values_of_min_temp()
+        total = sum([int(rec.min_temp) for rec in valid_min_temps])
         return total / len(self.file_records)
 
     def get_average_mean_humidity(self):
@@ -175,11 +165,8 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        valid_mean_humidity = [
-            int(rec.mean_humidity) for rec in self.file_records
-            if rec.mean_humidity
-        ]
-        total = sum(valid_mean_humidity)
+        valid_mean_humidity = self.remove_none_values_of_mean_humidity()
+        total = sum([int(rec.mean_humidity) for rec in valid_mean_humidity])
         return total / len(self.file_records)
 
     def get_charts_data(self):
