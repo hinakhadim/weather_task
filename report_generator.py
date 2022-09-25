@@ -1,6 +1,6 @@
 from typing import List, Optional
-from report_types import AverageTempHumidReportType
-from report_types import HighLowTempHumidityReportType
+from custom_types import AverageTempHumidReportType
+from custom_types import HighLowTempHumidityReportType
 from weather_record import WeatherRecord
 from constants import COLORS
 

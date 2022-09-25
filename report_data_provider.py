@@ -1,7 +1,7 @@
-from year_month_matched_file_paths_provider \
-    import YearMonthMatchedFilePathsProvider
+from year_month_matched_file_paths_provider import (
+    YearMonthMatchedFilePathsProvider
+)
 from weather_data_analyzer import WeatherDataAnalyzer
-from validations import is_month_not_given
 
 
 class ReportDataProvider:
@@ -20,7 +20,7 @@ class ReportDataProvider:
         Get file paths matched with the given year_month and pass them into
         weather analyzer
 
-        :param year_month:
+        :param year_month: DateObj
         :param data_folder:
         """
 
@@ -50,9 +50,6 @@ class ReportDataProvider:
         :return: AverageTempHumidReportType
         """
 
-        if is_month_not_given(self.year_month):
-            raise Exception("Error: Month is required to perform calculations")
-
         report_data = self.data_analyzer.calc_average_temp_and_humidity()
         return report_data
 
@@ -62,8 +59,6 @@ class ReportDataProvider:
 
         :return: List[WeatherRecords]
         """
-        if is_month_not_given(self.year_month):
-            raise Exception("Error: Month is required to perform calculations")
 
         report_data = self.data_analyzer.get_charts_data()
         return report_data

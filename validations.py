@@ -1,51 +1,42 @@
 import os
+import re
+from exceptions import *
+from custom_types import DateObj
 
 
-def is_not_valid_directory_path(folder_path):
+def check_directory_path_exists(folder_path):
     """
     Checks whether the given folder path is valid or not
 
     :param folder_path:
-    :return: bool
     """
 
-    return not os.path.isdir(folder_path)
+    if not os.path.isdir(folder_path):
+        raise FolderDoesNotExist("Invalid path to directory : ", folder_path)
 
 
-def check_month_is_valid_number(month_number_string):
-    """
-    Check month should not contain alphabets/characters and
-    the given month number is in the range b/w 1 - 12
+def validate_year(year):
+    matched_result = re.search(r'^\d{4}$', year)
 
-    :param month_number_string:
-    """
+    if matched_result:
+        date_object = DateObj(month=None, year=matched_result[0])
+        return date_object
 
-    if not month_number_string.isdigit():
-        raise Exception("Month name should be a valid Number")
-
-    month = int(month_number_string)
-    if month < 1 or month > 12:
-        raise Exception("Month name should be valid number from 1 - 12")
+    raise YearRequired("Year should be valid 4 digit number")
 
 
-def is_month_exists(split_year_month):
-    """
-    Checks whether the given splitted year_month has month or not
+def validate_year_month(year_month):
+    matched_result = list(
+        re.finditer(
+            r'^(?P<year>\d{4})/(?P<month>(0?[1-9]|1[0-2]))$', year_month
+        )
+    )
 
-    :param split_year_month:
-    :return: bool
-    """
+    if len(matched_result) > 0:
+        matched_object = matched_result[0].groupdict()
 
-    return len(split_year_month) > 1
+        date_object = DateObj(matched_object['month'], matched_object['year'])
 
+        return date_object
 
-def is_month_not_given(year_month):
-    """
-    Check whether the given year_month does not contain month
-
-    :param year_month:
-    :return: bool
-    """
-
-    split_year_month = year_month.split("/")
-    return len(split_year_month) <= 1
+    raise MonthIsOutOfRange("Month must be valid integer in a range of 1 - 12")

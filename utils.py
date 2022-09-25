@@ -1,9 +1,9 @@
 import re
 
-from collections import namedtuple
+from custom_types import DateObj
 
 
-def get_month_year_from(filename):
+def get_month_year_from_filename(filename):
     """
     Extract month, year from given filename
 
@@ -15,8 +15,6 @@ def get_month_year_from(filename):
             r'(?P<year>\d+)_(?P<month>\w+)', filename
         )
     )
-
-    DateObj = namedtuple("DateObj", ['month', 'year'], defaults=['', ''])
 
     if len(matched_result) > 0:
         matched_object = matched_result[0].groupdict()

@@ -1,7 +1,7 @@
 import csv
 import sys
 from weather_record import WeatherRecord
-from report_types import (AverageTempHumidReportType,
+from custom_types import (AverageTempHumidReportType,
                           HighLowTempHumidityReportType)
 
 dummy_record_for_comparison = {
@@ -149,13 +149,11 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        total_sum_of_max_temp = 0
-        for record in self.file_records:
-
-            if record.max_temp:
-                total_sum_of_max_temp += int(record.max_temp)
-
-        return total_sum_of_max_temp / len(self.file_records)
+        valid_max_temps = [
+            int(rec.max_temp) for rec in self.file_records if rec.max_temp
+        ]
+        total = sum(valid_max_temps)
+        return total / len(self.file_records)
 
     def get_average_min_temperature(self):
         """
@@ -164,13 +162,11 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        total_sum_of_min_temp = 0
-        for record in self.file_records:
-
-            if record.min_temp:
-                total_sum_of_min_temp += int(record.min_temp)
-
-        return total_sum_of_min_temp / len(self.file_records)
+        valid_min_temps = [
+            int(rec.min_temp) for rec in self.file_records if rec.min_temp
+        ]
+        total = sum(valid_min_temps)
+        return total / len(self.file_records)
 
     def get_average_mean_humidity(self):
         """
@@ -179,14 +175,12 @@ class WeatherDataAnalyzer:
         :return: average - float
         """
 
-        total_sum_of_mean_humidity = 0
-
-        for record in self.file_records:
-
-            if record.mean_humidity:
-                total_sum_of_mean_humidity += int(record.mean_humidity)
-
-        return total_sum_of_mean_humidity / len(self.file_records)
+        valid_mean_humidity = [
+            int(rec.mean_humidity) for rec in self.file_records
+            if rec.mean_humidity
+        ]
+        total = sum(valid_mean_humidity)
+        return total / len(self.file_records)
 
     def get_charts_data(self):
         """

@@ -5,12 +5,15 @@ HighLowTempHumidityReportType = namedtuple(
         'highest_temperature',
         'lowest_temperature',
         'high_humidity'],
-    defaults=['', '', ''])
-
+    defaults=['', '', '']
+)
 
 AverageTempHumidReportType = namedtuple(
     "AverageTempHumidityReportType", [
         'average_max_temperature',
         'average_min_temperature',
         'average_mean_humidity'],
-    defaults=['', '', ''])
+    defaults=['', '', '']
+)
+
+DateObj = namedtuple("DateObj", ['month', 'year'], defaults=['', ''])

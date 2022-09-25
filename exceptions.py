@@ -2,8 +2,15 @@ class BaseExceptionClass(Exception):
     pass
 
 
-
-class YearMonthRequired(BaseExceptionClass):
+class FolderDoesNotExist(BaseExceptionClass):
     pass
 
-class
+
+class YearRequired(BaseExceptionClass):
+    pass
+
+
+class MonthIsOutOfRange(BaseExceptionClass):
+    pass
+
+

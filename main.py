@@ -1,11 +1,14 @@
 from constants import CURRENT_DIRECTORY
 
-from validations import is_not_valid_directory_path
+from validations import (check_directory_path_exists,
+                         validate_year_month,
+                         validate_year
+                         )
 from report_data_provider import ReportDataProvider
 from report_generator import ReportGenerator
 
 import argparse
-import traceback
+
 
 if __name__ == "__main__":
 
@@ -24,7 +27,7 @@ if __name__ == "__main__":
 
     arg_parser.add_argument(
         '-e',
-        type=str,
+        type=validate_year,
         metavar="year",
         help="To display the highest, lowest "
              "temperature and highest humidity"
@@ -32,7 +35,7 @@ if __name__ == "__main__":
 
     arg_parser.add_argument(
         '-a',
-        type=str,
+        type=validate_year_month,
         metavar="year/mm",
         help="To display the average high, low "
              "temperature and average mean humidity"
@@ -40,7 +43,7 @@ if __name__ == "__main__":
 
     arg_parser.add_argument(
         '-c',
-        type=str,
+        type=validate_year_month,
         metavar="year/mm",
         help="Display charts of high and low "
              "temperature for each day"
@@ -48,7 +51,7 @@ if __name__ == "__main__":
 
     arg_parser.add_argument(
         '-cs',
-        type=str,
+        type=validate_year_month,
         metavar="year/mm",
         help="Display one line charts of high and low "
              "temperature for each day"
@@ -57,11 +60,7 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     weather_data_folder_path = CURRENT_DIRECTORY + args.data_folder[0]
-
-    if is_not_valid_directory_path(weather_data_folder_path):
-        raise Exception(
-            "Invalid path to directory : ", weather_data_folder_path
-        )
+    check_directory_path_exists(weather_data_folder_path)
 
     report_generator = ReportGenerator()
 
