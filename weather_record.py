@@ -6,6 +6,6 @@ class WeatherRecord:
         self.min_temp = record_item['Min TemperatureC']
         self.max_temp = record_item['Max TemperatureC']
         self.mean_temp = record_item['Mean TemperatureC']
-        self.min_humidity = record_item[' Min Humidity']
+        self.min_humidity = record_item['Min Humidity']
         self.max_humidity = record_item['Max Humidity']
-        self.mean_humidity = record_item[' Mean Humidity']
+        self.mean_humidity = record_item['Mean Humidity']

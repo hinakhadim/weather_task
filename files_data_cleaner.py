@@ -4,6 +4,9 @@ import fileinput
 
 
 def remove_spaces_from_header_files(folder):
+    """ Rename the file headers - Trim the spaces in header names of files and
+    then save again """
+
     for filename in os.listdir(folder):
         file_name = os.path.join(folder, filename)
         df = pd.read_csv(file_name, nrows=0)  # read only the header row

@@ -4,6 +4,11 @@
 ### How to Run:
 
 
+First Rename the header of all files (trimming the spaces in file columns name)
+```commandline
+python3 files_data_cleaner.py
+```
+
 > For Question 1:
 ```bash
 

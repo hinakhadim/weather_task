@@ -5,10 +5,12 @@ from validations import (check_directory_path_exists,
                          validate_year
                          )
 from report_data_provider import ReportDataProvider
-from report_generator import ReportGenerator
+from report_generator import (HighLowTemperatureAndHumidityReport,
+                              AverageTemperatureAndHumidityReport,
+                              TemperatureChartsReport
+                              )
 
 import argparse
-
 
 if __name__ == "__main__":
 
@@ -26,7 +28,7 @@ if __name__ == "__main__":
     )
 
     arg_parser.add_argument(
-        '-e',
+        '-display_report',
         type=validate_year,
         metavar="year",
         help="To display the highest, lowest "
@@ -34,15 +36,14 @@ if __name__ == "__main__":
     )
 
     arg_parser.add_argument(
-        '-a',
+        '-average_stats_report',
         type=validate_year_month,
         metavar="year/mm",
         help="To display the average high, low "
              "temperature and average mean humidity"
     )
-
     arg_parser.add_argument(
-        '-c',
+        '-charts',
         type=validate_year_month,
         metavar="year/mm",
         help="Display charts of high and low "
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     )
 
     arg_parser.add_argument(
-        '-cs',
+        '-single_line_chart',
         type=validate_year_month,
         metavar="year/mm",
         help="Display one line charts of high and low "
@@ -62,38 +63,32 @@ if __name__ == "__main__":
     weather_data_folder_path = CURRENT_DIRECTORY + args.data_folder[0]
     check_directory_path_exists(weather_data_folder_path)
 
-    report_generator = ReportGenerator()
-
-    if args.e:
-        data_provider = ReportDataProvider(args.e, weather_data_folder_path)
+    if args.display_report:
+        data_provider = ReportDataProvider(
+            args.display_report, weather_data_folder_path
+        )
         report_data = data_provider.get_high_low_temp_high_humidity_data()
 
-        report_generator.gen_report_highest_lowest_temp_and_humidity(
-            report_data
-        )
+        report = HighLowTemperatureAndHumidityReport(report_data)
+        report.print_report()
 
-    if args.a:
-        data_provider = ReportDataProvider(args.a, weather_data_folder_path)
+    if args.average_stats_report:
+        data_provider = ReportDataProvider(
+            args.average_stats_report, weather_data_folder_path
+        )
         report_data = data_provider.get_average_temp_and_humidity()
 
-        report_generator.gen_report_average_max_min_temp_and_mean_humidity(
-            report_data
-        )
+        report = AverageTemperatureAndHumidityReport(report_data)
+        report.print_report()
 
-    if args.c:
-        data_provider = ReportDataProvider(args.c, weather_data_folder_path)
-        report_data = data_provider.get_chart_data()
+    chart_arguments = {'c': args.charts, 'cs': args.single_line_chart}
+    for arg, value in chart_arguments.items():
 
-        report_generator.gen_report_high_low_temperature_charts(
-            report_data
-        )
+        if value:
+            data_provider = ReportDataProvider(value, weather_data_folder_path)
+            report_data = data_provider.get_chart_data()
 
-    if args.cs:
-        data_provider = ReportDataProvider(
-            args.cs, weather_data_folder_path
-        )
-        report_data = data_provider.get_chart_data()
-
-        report_generator.gen_report_high_low_temperature_single_line_chart(
-            report_data
-        )
+            report = TemperatureChartsReport(
+                report_data, single_line_chart=(arg == 'cs')
+            )
+            report.print_report()

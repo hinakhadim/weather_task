@@ -49,9 +49,9 @@ class YearMonthMatchedFilePathsProvider:
         year
         """
         user_given_month = Months[int(self.month) - 1]
+
         for file_name in os.listdir(self.data_folder_path):
-            file_month_year = get_month_year_from_filename(file_name)
-            file_month, file_year = file_month_year.month, file_month_year.year
+            file_month, file_year = get_month_year_from_filename(file_name)
 
             if user_given_month == file_month and self.year == file_year:
                 self.matched_file_paths_with_year_month.append(

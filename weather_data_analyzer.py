@@ -4,7 +4,8 @@ from typing import List
 
 from weather_record import WeatherRecord
 from custom_types import (AverageTempHumidReportType,
-                          HighLowTempHumidityReportType)
+                          HighLowTempHumidityReportType
+                          )
 
 
 class WeatherDataAnalyzer:
@@ -49,73 +50,56 @@ class WeatherDataAnalyzer:
         :return: HighLowTempHumidityReportType
         """
 
-        valid_high_temp_records = self.remove_none_values_of_max_temp()
-        valid_low_temp_records = self.remove_none_values_of_min_temp()
-        valid_high_humidity_records = self.remove_none_values_of_max_humidity()
+        report_fields = {'max_temp': 0, 'min_temp': 0, 'max_humidity': 0}
 
-        max_high_temp = max(
-            valid_high_temp_records, key=lambda x: int(x.max_temp)
-        )
-        min_low_temp = min(
-            valid_low_temp_records, key=lambda x: int(x.min_temp)
-        )
-        max_high_humidity = max(
-            valid_high_humidity_records, key=lambda x: int(x.max_humidity)
-        )
+        for field, value in report_fields.items():
+            valid_records = self.remove_none_values_of(field)
+
+            if 'min' in field:
+                extreme_value = self.get_min_value(valid_records, field)
+            else:
+                extreme_value = self.get_max_value(valid_records, field)
+
+            report_fields[field] = extreme_value
 
         return HighLowTempHumidityReportType(
-            highest_temperature=max_high_temp,
-            lowest_temperature=min_low_temp,
-            high_humidity=max_high_humidity
+            highest_temperature=report_fields['max_temp'],
+            lowest_temperature=report_fields['min_temp'],
+            high_humidity=report_fields['max_humidity']
         )
 
-    def remove_none_values_of_max_temp(self):
+    def get_min_value(self, record_list, field):
+        """ Returns min value of the given field from record list """
+
+        return min(
+            record_list, key=lambda x: self.get_attr_value(x, field)
+        )
+
+    def get_max_value(self, record_list, field):
+        """ Returns max value of the given field from record list """
+
+        return max(
+            record_list, key=lambda x: self.get_attr_value(x, field)
+        )
+
+    def remove_none_values_of(self, field_name: str):
         """
-        Removes the records from file_records whose max_temperature value is None
+        Removes the records from file_records whose given field value is
+        empty string/None
 
         :return: List[WeatherRecords]
         """
 
-        valid_max_temps = [
-            rec for rec in self.file_records if rec.max_temp
-        ]
-        return valid_max_temps
+        return list(
+            filter(
+                lambda rec: self.get_attr_value(rec, field_name),
+                self.file_records
+            )
+        )
 
-    def remove_none_values_of_min_temp(self):
-        """
-        Removes the records from file_records whose min_temperature value is None
-
-        :return: List[WeatherRecords]
-        """
-
-        valid_min_temps = [
-            rec for rec in self.file_records if rec.min_temp
-        ]
-        return valid_min_temps
-
-    def remove_none_values_of_max_humidity(self):
-        """
-        Removes the records from file_records whose max_humidity value is None
-
-        :return: List[WeatherRecords]
-        """
-
-        valid_max_humidity = [
-            rec for rec in self.file_records if rec.max_humidity
-        ]
-        return valid_max_humidity
-
-    def remove_none_values_of_mean_humidity(self):
-        """
-        Removes the records from file_records whose mean_humidity value is None
-
-        :return: List[WeatherRecords]
-        """
-
-        valid_mean_humidity = [
-            rec for rec in self.file_records if rec.mean_humidity
-        ]
-        return valid_mean_humidity
+    def get_attr_value(self, record: WeatherRecord, field: str):
+        record_dict = vars(record)
+        return int(record_dict[field]) if record_dict[field] else None
 
     def calc_average_temp_and_humidity(self):
         """
@@ -129,44 +113,20 @@ class WeatherDataAnalyzer:
             return None
 
         report = AverageTempHumidReportType(
-            average_max_temperature=self.get_average_max_temperature(),
-            average_min_temperature=self.get_average_min_temperature(),
-            average_mean_humidity=self.get_average_mean_humidity()
+            average_max_temperature=self.get_average_of("max_temp"),
+            average_min_temperature=self.get_average_of("min_temp"),
+            average_mean_humidity=self.get_average_of("mean_humidity")
         )
 
         return report
 
-    def get_average_max_temperature(self):
-        """
-        Calculates the average of max_temperature from the file_records list
+    def get_average_of(self, field):
+        """ Returns Average of given field values """
 
-        :return: average - float
-        """
-
-        valid_max_temps = self.remove_none_values_of_max_temp()
-        total = sum([int(rec.max_temp) for rec in valid_max_temps])
-        return total / len(self.file_records)
-
-    def get_average_min_temperature(self):
-        """
-        Calculates the average of min_temperature from the file_records list
-
-        :return: average - float
-        """
-
-        valid_min_temps = self.remove_none_values_of_min_temp()
-        total = sum([int(rec.min_temp) for rec in valid_min_temps])
-        return total / len(self.file_records)
-
-    def get_average_mean_humidity(self):
-        """
-        Calculates the average of mean_humidity from the file_records list
-
-        :return: average - float
-        """
-
-        valid_mean_humidity = self.remove_none_values_of_mean_humidity()
-        total = sum([int(rec.mean_humidity) for rec in valid_mean_humidity])
+        valid_attribute_records = self.remove_none_values_of(field)
+        total = sum(
+            [self.get_attr_value(rec, field) for rec in valid_attribute_records]
+        )
         return total / len(self.file_records)
 
     def get_charts_data(self):
